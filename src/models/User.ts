@@ -1,18 +1,15 @@
 import mongoose from "mongoose";
-const passportLocalMongoose = require("passport-local-mongoose");
 
 const User = new mongoose.Schema({
   _id: { type: mongoose.Types.ObjectId, auto: true, hide: true },
-  username: {
+  login: {
     type: String,
     required: true,
+    unique: true,
   },
-  salt: {
+  password: {
     type: String,
-    hide: true,
-  },
-  hash: {
-    type: String,
+    required: true,
     hide: true,
   },
   is_admin: {
@@ -20,7 +17,5 @@ const User = new mongoose.Schema({
     default: false,
   },
 });
-
-User.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", User);

@@ -1,20 +1,15 @@
 import express = require("express");
+import userService from "@/services/userService";
 const router = express.Router();
-const User = require("@/models/User");
 
 router.post("/register", async (req, res) => {
   try {
-    User.register(
-      req.body.username,
-      req.body.password,
-      function (err: any, user: any) {
-        let result = err ?? user;
-        res.send({
-          status: 200,
-          message: result,
-        });
-      }
-    );
+    const { login, password } = req.body;
+    const result = await userService.register(login, password);
+    res.send({
+      status: 200,
+      message: result,
+    });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -22,13 +17,11 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   try {
-    const { user } = await User.authenticate()(
-      req.body.username,
-      req.body.password
-    );
+    const { login, password } = req.body;
+    const { status, message } = await userService.login(login, password);
     res.send({
-      status: 200,
-      message: user,
+      status: status,
+      message: message,
     });
   } catch (err) {
     res.status(500).send(err);

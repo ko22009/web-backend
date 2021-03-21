@@ -11,7 +11,7 @@ require("fs")
   .readdirSync(normalizedPath)
   .forEach(function (file: string) {
     if (file.split(".")[0] === "index") return;
-    const json = require("./" + file);
+    const json = require("./" + file).default;
     data.push(json);
     modelsPaths.push(json.model);
   });
