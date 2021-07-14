@@ -1,5 +1,7 @@
 import "module-alias/register";
 import express from "express";
+import session from "express-session";
+import MongoStore from "connect-mongo";
 import mongoose from "mongoose";
 const mongooseHidden = require("mongoose-hidden")();
 const fileUpload = require("express-fileupload");
@@ -23,6 +25,17 @@ mongoose.connection.on(
   console.error.bind(console, "MongoDB connection error:")
 );
 
+app.use(
+  session({
+    secret: "keyboard cat",
+    store: MongoStore.create({
+      mongoUrl: process.env.APP_DATABASE,
+    }),
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+
 app.use(compression({ threshold: 0 }));
 
 app.use(
@@ -35,8 +48,8 @@ app.use("/uploads", express.static("uploads"));
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
-    optionsSuccessStatus: 200,
+    origin: ["http://localhost:3000"],
+    credentials: true,
   })
 );
 

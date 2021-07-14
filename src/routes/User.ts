@@ -19,6 +19,9 @@ router.post("/login", async (req, res) => {
   try {
     const { login, password } = req.body;
     const { status, message } = await userService.login(login, password);
+    if (status === 200) {
+      req.session.user_id = message.user_id;
+    }
     res.send({
       status: status,
       message: message,
@@ -26,6 +29,10 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     res.status(500).send(err);
   }
+});
+
+router.post("/logout", (req, res) => {
+  req.session.destroy((err) => console.log(err));
 });
 
 module.exports = router;

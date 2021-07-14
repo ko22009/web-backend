@@ -1,6 +1,5 @@
 const User = require("@/models/User");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 const userService = {
   register: async (login: string, password: string) => {
@@ -13,24 +12,15 @@ const userService = {
   login: async (login: string, password: string) => {
     const user = await User.findOne({ login });
     let status = 400;
-    let message: Object = {
-      error: "Не корректный логин или пароль",
+    let message: any = {
+      error: "Login or password is not correct",
     };
     if (user) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (isMatch) {
-        const token = jwt.sign(
-          {
-            userId: user.id,
-          },
-          process.env.JWT_SECRET,
-          {
-            expiresIn: "24h",
-          }
-        );
         status = 200;
         message = {
-          token,
+          user_id: user._id,
         };
       }
     }
