@@ -1,33 +1,41 @@
-const User = require("@/models/User");
+import { User } from "@/models/User";
+
 const bcrypt = require("bcryptjs");
+
+export interface FoundUser {
+  id: string;
+}
+
+export function isFoundUser(message: any): message is FoundUser {
+  return (message as FoundUser).id != undefined;
+}
 
 const userService = {
   register: async (login: string, password: string) => {
     const hashedPassword = await bcrypt.hash(password, 12);
     const user = new User({ login, password: hashedPassword });
-    return await user.save(function (err: any, user: any) {
-      return err ?? user;
-    });
+    const res = await user.save();
+    return {
+      status: 200,
+      message: res,
+    };
   },
   login: async (login: string, password: string) => {
-    const user = await User.findOne({ login });
-    let status = 400;
-    let message: any = {
-      error: "Login or password is not correct",
+    const user = await User.findOne({ login }).exec();
+    const isMatch = await bcrypt.compare(password, user?.password);
+    let response: RResponse = {
+      status: 200,
+      message: {
+        id: user?._id,
+      },
     };
-    if (user) {
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (isMatch) {
-        status = 200;
-        message = {
-          user_id: user._id,
-        };
-      }
+    if (!user || !isMatch) {
+      response = {
+        status: 400,
+        message: "Login or password is not correct",
+      };
     }
-    return {
-      status: status,
-      message: message,
-    };
+    return response;
   },
 };
 
