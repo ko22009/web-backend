@@ -30,7 +30,12 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/logout", (req, res) => {
-  req.session.destroy((err) => console.log(err));
+  req.session.destroy((err) => {
+    res.json({
+      status: err ? 500 : 200,
+      message: err ?? "logout",
+    });
+  });
 });
 
 module.exports = router;
